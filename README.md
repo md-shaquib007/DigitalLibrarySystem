@@ -1,8 +1,10 @@
 # Smart Digital Library — Open Access Management System
 
-![Build Status](https://img.shields.io/badge/build-passing-brightgreen) ![Java](https://img.shields.io/badge/java-17%2F21-orange) ![Jakarta Servlets](https://img.shields.io/badge/jakarta--servlet-6.0-blue) ![Hibernate](https://img.shields.io/badge/hibernate-6.4-green) ![Thymeleaf](https://img.shields.io/badge/thymeleaf-3.1-blueviolet) ![License](https://img.shields.io/badge/license-MIT-green)
+![Build Status](https://img.shields.io/badge/build-passing-brightgreen) ![Java](https://img.shields.io/badge/java-17%2F21-orange) ![Jakarta Servlets](https://img.shields.io/badge/jakarta--servlet-6.0-blue) ![Hibernate](https://img.shields.io/badge/hibernate-6.4-green) ![Thymeleaf](https://img.shields.io/badge/thymeleaf-3.1-blueviolet) ![License](https://img.shields.io/badge/license-MIT-green) ![Vercel](https://img.shields.io/badge/vercel-ready-black) ![Docker](https://img.shields.io/badge/docker-ready-blue)
 
 A **free, open digital library platform** for college students. Browse and download PDF books by domain — with zero friction, zero signups for students, and instant access.
+
+![Digital Library Preview](docs/preview.png)
 
 **Admin / Librarians** upload and manage digital resources. **Students** visit, search, and download PDFs.
 
@@ -34,8 +36,8 @@ flowchart TD
 | **Backend** | Java 17+, Jakarta Servlet 6, Hibernate ORM 6, HikariCP |
 | **View Engine** | Thymeleaf 3.1, Bootstrap 5, FontAwesome |
 | **Authentication** | BCrypt Password Hashing, Session Management, Security Filters |
-| **Testing** | JUnit 5, Mockito, H2 Database |
-| **Containers** | Docker, Docker Compose, Tomcat 10.1 |
+| **Testing** | JUnit 5, Mockito, H2 Database (In-Memory) |
+| **Containers & Deployment** | Docker, Docker Compose, Tomcat 10.1, Vercel (`vercel.json`) |
 
 ---
 
@@ -51,7 +53,15 @@ flowchart TD
 
 ## Setup & Deployment
 
-### Option 1: Docker Compose (Recommended)
+### Option 1: Vercel Deployment (Static Web Assets)
+
+DigitalLibrarySystem includes a custom `vercel.json` for asset hosting on Vercel:
+
+1. Import the repository into [Vercel Dashboard](https://vercel.com/new).
+2. Set Root Directory to `DigitalLibrarySystem`.
+3. Deploy!
+
+### Option 2: Docker Compose (Full Stack Tomcat 10 + MySQL 8)
 
 Start MySQL database and Tomcat container with 1 command:
 
@@ -60,7 +70,7 @@ docker compose up --build -d
 ```
 Access the application at `http://localhost:8080/`.
 
-### Option 2: Local Manual Setup
+### Option 3: Local Manual Setup
 
 #### Prerequisites
 - Java 17+
@@ -74,7 +84,7 @@ CREATE DATABASE digital_library;
 ```
 
 #### 2. Configure Hibernate (`src/main/resources/hibernate.cfg.xml`)
-Update MySQL username and password.
+`HibernateUtil` automatically detects environment variables (`JDBC_URL`, `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASS`). Update `hibernate.cfg.xml` for local manual overrides.
 
 #### 3. Build & Run Tests
 ```bash
