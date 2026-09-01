@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<section th:fragment="form(title, action, book)">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <h3 th:text="${title}">Book Form</h3>
+                    <form th:action="${action}" method="post" enctype="multipart/form-data" class="mt-4">
+                        <div class="mb-3">
+                            <label class="form-label">Title *</label>
+                            <input type="text" name="title" class="form-control" required
+                                   th:value="${dto != null ? dto.title : ''}"/>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Edition</label>
+                                <input type="text" name="edition" class="form-control" placeholder="e.g. 2nd Edition"
+                                       th:value="${dto != null ? dto.edition : ''}"/>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Category *</label>
+                                <select name="categoryId" class="form-select" required>
+                                    <option value="">Select category</option>
+                                    <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"
+                                            th:selected="${dto != null && dto.categoryId == cat.id}"></option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea name="description" class="form-control" rows="4"
+                                      th:text="${dto != null ? dto.description : ''}"></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Publisher</label>
+                                <select name="publisherId" class="form-select">
+                                    <option value="">Select publisher</option>
+                                    <option th:each="pub : ${publishers}" th:value="${pub.id}" th:text="${pub.name}"
+                                            th:selected="${dto != null && dto.publisherId == pub.id}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Authors (comma-separated)</label>
+                                <input type="text" name="authorNames" class="form-control"
+                                       placeholder="e.g. John Doe, Jane Smith"
+                                       th:value="${dto != null ? dto.authorNames : ''}"/>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Tags (comma-separated)</label>
+                            <input type="text" name="tags" class="form-control"
+                                   placeholder="e.g. MERN, React, Node.js, Full Stack"
+                                   th:value="${dto != null ? dto.tags : ''}"/>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Upload PDF *</label>
+                            <input type="file" name="bookFile" class="form-control" accept=".pdf"
+                                   th:required="${book == null}"/>
+                            <small class="text-muted">Max 50MB. Students download this directly — no login needed.</small>
+                            <div th:if="${book != null && book.fileName}" class="mt-1">
+                                <small>Current file: <span th:text="${book.fileName}"></span></small>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">Save Book</button>
+                            <a th:href="@{/books}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</html>

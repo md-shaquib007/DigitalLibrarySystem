@@ -1,0 +1,5 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout('Edit Book', ~{::section})}">
+<section th:replace="~{books/_form :: form('Edit Book', @{/books/{id}/edit(id=${book.id})}, ${book})}"></section>
+</html>

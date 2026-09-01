@@ -1,0 +1,36 @@
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+release.properties
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.classpath
+*.project
+.settings/
+bin/
+out/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Uploaded books (keep directory, ignore files)
+uploads/books/*
+!uploads/books/.gitkeep
+
+# Local config overrides
+src/main/resources/hibernate-local.cfg.xml
+.env
+*.local.properties
+
+# Tomcat
+.tomcat/

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout('Books', ~{::section})}">
+<section>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-bookshelf"></i> Book Catalog</h2>
+        <a th:if="${isLibrarian}" th:href="@{/books/new}" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Add Book
+        </a>
+    </div>
+
+    <!-- Advanced Search -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <form th:action="@{/books}" method="get" class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" name="keyword" class="form-control" placeholder="Search title, tags, ISBN..."
+                           th:value="${search.keyword}"/>
+                </div>
+                <div class="col-md-2">
+                    <select name="categoryId" class="form-select">
+                        <option value="">All Categories</option>
+                        <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"
+                                th:selected="${search.categoryId != null && search.categoryId == cat.id}"></option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="authorId" class="form-select">
+                        <option value="">All Authors</option>
+                        <option th:each="author : ${authors}" th:value="${author.id}" th:text="${author.name}"
+                                th:selected="${search.authorId != null && search.authorId == author.id}"></option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="sortBy" class="form-select">
+                        <option value="title" th:selected="${search.sortBy == 'title'}">Sort: Title</option>
+                        <option value="createdAt" th:selected="${search.sortBy == 'createdAt'}">Sort: Newest</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i> Search</button>
+                </div>
+                <div class="col-12">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" name="digitalOnly" value="true"
+                               th:checked="${search.digitalOnly}"/>
+                        <label class="form-check-label">PDF download available only</label>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Book Grid -->
+    <div class="row g-4">
+        <div class="col-md-6 col-lg-4" th:each="book : ${books}">
+            <div class="card book-card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="badge bg-primary" th:text="${book.category.name}">Category</span>
+                        <span th:if="${book.digitalAvailable}"><i class="bi bi-file-earmark-pdf text-danger fs-5"></i></span>
+                    </div>
+                    <h5 class="card-title" th:text="${book.title}">Book Title</h5>
+                    <p class="card-text text-muted small" th:text="${#strings.abbreviate(book.description, 100)}">Description</p>
+                    <div class="mb-2">
+                        <span th:each="author : ${book.authors}" class="badge bg-light text-dark me-1"
+                              th:text="${author.name}">Author</span>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a th:href="@{/books/{id}(id=${book.id})}" class="btn btn-sm btn-outline-primary">View</a>
+                        <a th:if="${book.digitalAvailable}" th:href="@{/download/{id}(id=${book.id})}"
+                           class="btn btn-sm btn-danger"><i class="bi bi-download"></i> PDF</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div th:if="${#lists.isEmpty(books)}" class="col-12 text-center py-5">
+            <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+            <p class="text-muted mt-2">No books found matching your criteria</p>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <nav th:if="${pageResult.totalPages > 1}" class="mt-4">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${!pageResult.hasPrevious()} ? 'disabled'">
+                <a class="page-link" th:href="@{/books(page=${pageResult.currentPage - 1}, keyword=${search.keyword}, categoryId=${search.categoryId})}">Previous</a>
+            </li>
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, pageResult.totalPages - 1)}"
+                th:classappend="${i == pageResult.currentPage} ? 'active'">
+                <a class="page-link" th:href="@{/books(page=${i}, keyword=${search.keyword}, categoryId=${search.categoryId})}"
+                   th:text="${i + 1}">1</a>
+            </li>
+            <li class="page-item" th:classappend="${!pageResult.hasNext()} ? 'disabled'">
+                <a class="page-link" th:href="@{/books(page=${pageResult.currentPage + 1}, keyword=${search.keyword}, categoryId=${search.categoryId})}">Next</a>
+            </li>
+        </ul>
+    </nav>
+</section>
+</html>

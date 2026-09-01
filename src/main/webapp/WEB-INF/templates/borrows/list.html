@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout('Borrow History', ~{::section})}">
+<section>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-arrow-left-right"></i>
+            <span th:text="${staffView} ? 'All Active Borrows' : 'My Borrow History'">Borrows</span>
+        </h2>
+        <div th:if="${isLibrarian}">
+            <a th:if="${!staffView}" th:href="@{/borrows(view='all')}" class="btn btn-outline-primary btn-sm">View All Active</a>
+            <a th:if="${staffView}" th:href="@{/borrows}" class="btn btn-outline-secondary btn-sm">My History</a>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th th:if="${staffView}">User</th>
+                    <th>Book</th>
+                    <th>Category</th>
+                    <th>Borrow Date</th>
+                    <th>Due Date</th>
+                    <th>Return Date</th>
+                    <th>Status</th>
+                    <th>Fine</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="borrow : ${borrows}">
+                    <td th:if="${staffView}" th:text="${borrow.user.fullName}">User</td>
+                    <td><a th:href="@{/books/{id}(id=${borrow.book.id})}" th:text="${borrow.book.title}">Book</a></td>
+                    <td><span class="badge bg-primary" th:text="${borrow.book.category.name}">Cat</span></td>
+                    <td th:text="${#temporals.format(borrow.borrowDate, 'dd MMM yyyy')}">Date</td>
+                    <td th:text="${#temporals.format(borrow.dueDate, 'dd MMM yyyy')}">Due</td>
+                    <td th:text="${borrow.returnDate != null ? #temporals.format(borrow.returnDate, 'dd MMM yyyy') : '-'}">-</td>
+                    <td>
+                        <span class="badge"
+                              th:classappend="${borrow.status.name() == 'RETURNED'} ? 'bg-success' : (${borrow.overdue} ? 'bg-danger' : 'bg-warning')"
+                              th:text="${borrow.status}">Status</span>
+                    </td>
+                    <td>
+                        <span th:if="${borrow.fine != null}" class="text-danger"
+                              th:text="'₹' + ${borrow.fine.amount}">₹0</span>
+                        <span th:unless="${borrow.fine != null}">-</span>
+                    </td>
+                    <td>
+                        <form th:if="${borrow.status.name() == 'BORROWED'}" th:action="@{/borrows/{id}/return(id=${borrow.id})}" method="post">
+                            <button type="submit" class="btn btn-sm btn-success">Return</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(borrows)}">
+                    <td th:colspan="${staffView ? 9 : 8}" class="text-center text-muted py-4">No borrow records found</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+</html>

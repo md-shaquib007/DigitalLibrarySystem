@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout('Reservations', ~{::section})}">
+<section>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-bookmark"></i>
+            <span th:text="${staffView} ? 'Pending Reservations' : 'My Reservations'">Reservations</span>
+        </h2>
+        <div th:if="${isLibrarian}">
+            <a th:if="${!staffView}" th:href="@{/reservations(view='all')}" class="btn btn-outline-primary btn-sm">View All Pending</a>
+            <a th:if="${staffView}" th:href="@{/reservations}" class="btn btn-outline-secondary btn-sm">My Reservations</a>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th th:if="${staffView}">User</th>
+                    <th>Book</th>
+                    <th>Category</th>
+                    <th>Reserved At</th>
+                    <th>Expires At</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="res : ${reservations}">
+                    <td th:if="${staffView}" th:text="${res.user.fullName}">User</td>
+                    <td><a th:href="@{/books/{id}(id=${res.book.id})}" th:text="${res.book.title}">Book</a></td>
+                    <td><span class="badge bg-primary" th:text="${res.book.category.name}">Cat</span></td>
+                    <td th:text="${#temporals.format(res.reservedAt, 'dd MMM yyyy HH:mm')}">Date</td>
+                    <td th:text="${#temporals.format(res.expiresAt, 'dd MMM yyyy HH:mm')}">Expires</td>
+                    <td><span class="badge bg-info" th:text="${res.status}">Status</span></td>
+                    <td>
+                        <form th:if="${res.status.name() == 'PENDING' && !staffView}"
+                              th:action="@{/reservations/{id}/cancel(id=${res.id})}" method="post">
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(reservations)}">
+                    <td th:colspan="${staffView ? 7 : 6}" class="text-center text-muted py-4">No reservations found</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+</html>

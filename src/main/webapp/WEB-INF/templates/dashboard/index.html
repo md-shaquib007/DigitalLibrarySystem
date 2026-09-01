@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout('Home', ~{::section})}">
+<section>
+    <div class="text-center mb-5 py-4 bg-primary bg-opacity-10 rounded-3">
+        <h1 class="display-5 fw-bold">College Digital Library</h1>
+        <p class="lead text-muted mb-3">Free learning resources — Tech, Hacking, Marketing, Product &amp; more.<br/>
+            No signup needed. Just browse and download.</p>
+        <a th:href="@{/books}" class="btn btn-primary btn-lg"><i class="bi bi-search"></i> Browse All Books</a>
+    </div>
+
+    <div class="row g-3 mb-4" th:if="${isLibrarian}">
+        <div class="col-md-4">
+            <div class="card stat-card border-0 shadow-sm text-center">
+                <div class="card-body">
+                    <i class="bi bi-bookshelf text-primary fs-3"></i>
+                    <h4 class="mt-2 mb-0" th:text="${stats.totalBooks}">0</h4>
+                    <small class="text-muted">Total Books</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card border-0 shadow-sm text-center">
+                <div class="card-body">
+                    <i class="bi bi-tags text-danger fs-3"></i>
+                    <h4 class="mt-2 mb-0" th:text="${stats.totalCategories}">0</h4>
+                    <small class="text-muted">Categories</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card border-0 shadow-sm text-center">
+                <div class="card-body">
+                    <a th:href="@{/books/new}" class="btn btn-outline-primary mt-2"><i class="bi bi-plus-lg"></i> Add New Book</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="mb-3"><i class="bi bi-grid"></i> Browse by Domain</h4>
+    <div class="row g-3 mb-5">
+        <div class="col-md-4 col-lg-3" th:each="cat : ${categories}">
+            <a th:href="@{/books(categoryId=${cat.id})}" class="text-decoration-none">
+                <div class="card category-card h-100 border-0 shadow-sm hover-lift">
+                    <div class="card-body text-center py-4">
+                        <i class="bi fs-1 text-primary" th:classappend="${cat.icon}"></i>
+                        <h5 class="mt-3" th:text="${cat.name}">Category</h5>
+                        <p class="text-muted small mb-0" th:text="${cat.description}">Description</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <h4 class="mb-3"><i class="bi bi-clock-history"></i> Recently Added</h4>
+    <div class="row g-3">
+        <div class="col-md-6 col-lg-4" th:each="book : ${recentBooks}">
+            <div class="card book-card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <span class="badge bg-primary mb-2" th:text="${book.category.name}">Category</span>
+                    <h5 th:text="${book.title}">Title</h5>
+                    <p class="text-muted small" th:text="${#strings.abbreviate(book.description, 80)}">Desc</p>
+                    <div class="d-flex gap-2">
+                        <a th:href="@{/books/{id}(id=${book.id})}" class="btn btn-sm btn-outline-primary">View</a>
+                        <a th:if="${book.digitalAvailable}" th:href="@{/download/{id}(id=${book.id})}"
+                           class="btn btn-sm btn-danger"><i class="bi bi-download"></i> PDF</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div th:if="${#lists.isEmpty(recentBooks)}" class="col-12 text-center text-muted py-4">
+            No books yet. Admin can add resources from the login panel.
+        </div>
+    </div>
+</section>
+</html>

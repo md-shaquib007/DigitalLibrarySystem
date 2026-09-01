@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout(${book.title}, ~{::section})}">
+<section>
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/books}">Books</a></li>
+            <li class="breadcrumb-item active" th:text="${book.title}">Book</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <span class="badge bg-primary mb-2" th:text="${book.category.name}">Category</span>
+                    <h2 th:text="${book.title}">Book Title</h2>
+                    <p class="text-muted" th:if="${book.edition}" th:text="${book.edition}">Edition</p>
+                    <p th:text="${book.description}">Description</p>
+
+                    <dl class="row mt-4">
+                        <dt class="col-sm-3">Authors</dt>
+                        <dd class="col-sm-9">
+                            <span th:each="author, stat : ${book.authors}">
+                                <span th:text="${author.name}">Author</span><span th:if="${!stat.last}">, </span>
+                            </span>
+                        </dd>
+                        <dt class="col-sm-3">Publisher</dt>
+                        <dd class="col-sm-9" th:text="${book.publisher != null ? book.publisher.name : 'N/A'}">Publisher</dd>
+                        <dt class="col-sm-3">Tags</dt>
+                        <dd class="col-sm-9">
+                            <span th:each="tag : ${#strings.arraySplit(book.tags, ',')}"
+                                  class="badge bg-light text-dark me-1" th:text="${#strings.trim(tag)}">tag</span>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <a th:if="${book.digitalAvailable}" th:href="@{/download/{id}(id=${book.id})}"
+                       class="btn btn-danger btn-lg w-100 mb-3">
+                        <i class="bi bi-download"></i> Download PDF
+                    </a>
+                    <p th:unless="${book.digitalAvailable}" class="text-muted text-center">
+                        PDF not uploaded yet.
+                    </p>
+                    <div th:if="${isLibrarian}" class="d-grid gap-2 mt-3">
+                        <a th:href="@{/books/{id}/edit(id=${book.id})}" class="btn btn-outline-secondary">
+                            <i class="bi bi-pencil"></i> Edit
+                        </a>
+                        <form th:action="@{/books/{id}/delete(id=${book.id})}" method="post"
+                              onsubmit="return confirm('Delete this book?')">
+                            <button type="submit" class="btn btn-outline-danger w-100">
+                                <i class="bi bi-trash"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: layout('Catalog Management', ~{::section})}">
+<section>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-tags"></i> Catalog Management</h2>
+        <div class="btn-group">
+            <a th:href="@{/catalog(type='categories')}" class="btn"
+               th:classappend="${type == 'categories'} ? 'btn-primary' : 'btn-outline-primary'">Categories</a>
+            <a th:href="@{/catalog(type='authors')}" class="btn"
+               th:classappend="${type == 'authors'} ? 'btn-primary' : 'btn-outline-primary'">Authors</a>
+            <a th:href="@{/catalog(type='publishers')}" class="btn"
+               th:classappend="${type == 'publishers'} ? 'btn-primary' : 'btn-outline-primary'">Publishers</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-4 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Add / Edit</h5>
+                </div>
+                <div class="card-body">
+                    <form th:action="@{/catalog}" method="post">
+                        <input type="hidden" name="action" value="save"/>
+                        <input type="hidden" name="type" th:value="${type}"/>
+                        <input type="hidden" name="id" id="editId"/>
+
+                        <div th:if="${type == 'categories'}">
+                            <div class="mb-3">
+                                <label class="form-label">Name *</label>
+                                <input type="text" name="name" id="editName" class="form-control" required
+                                       placeholder="e.g. Technology"/>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                <textarea name="description" id="editDescription" class="form-control" rows="2"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Bootstrap Icon Class</label>
+                                <input type="text" name="icon" id="editIcon" class="form-control" placeholder="bi-laptop"/>
+                            </div>
+                        </div>
+
+                        <div th:if="${type == 'authors'}">
+                            <div class="mb-3">
+                                <label class="form-label">Name *</label>
+                                <input type="text" name="name" id="editName" class="form-control" required/>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Bio</label>
+                                <textarea name="bio" id="editBio" class="form-control" rows="3"></textarea>
+                            </div>
+                        </div>
+
+                        <div th:if="${type == 'publishers'}">
+                            <div class="mb-3">
+                                <label class="form-label">Name *</label>
+                                <input type="text" name="name" id="editName" class="form-control" required/>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Address</label>
+                                <input type="text" name="address" id="editAddress" class="form-control"/>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Website</label>
+                                <input type="url" name="website" id="editWebsite" class="form-control"/>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th th:if="${type == 'categories'}">Description</th>
+                            <th th:if="${type == 'authors'}">Bio</th>
+                            <th th:if="${type == 'publishers'}">Website</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="item : ${items}">
+                            <td th:text="${item.id}">1</td>
+                            <td th:text="${item.name}">Name</td>
+                            <td th:if="${type == 'categories'}" th:text="${#strings.abbreviate(item.description, 50)}">Desc</td>
+                            <td th:if="${type == 'authors'}" th:text="${#strings.abbreviate(item.bio, 50)}">Bio</td>
+                            <td th:if="${type == 'publishers'}" th:text="${item.website}">Web</td>
+                            <td>
+                                <form th:action="@{/catalog}" method="post" class="d-inline"
+                                      onsubmit="return confirm('Delete this item?')">
+                                    <input type="hidden" name="action" value="delete"/>
+                                    <input type="hidden" name="type" th:value="${type}"/>
+                                    <input type="hidden" name="id" th:value="${item.id}"/>
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</html>
