@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /users/
+Disallow: /catalog/
+Disallow: /WEB-INF/
+Allow: /

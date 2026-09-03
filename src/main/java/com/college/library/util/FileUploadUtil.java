@@ -54,6 +54,14 @@ public final class FileUploadUtil {
     }
 
     public static Path resolveFilePath(String relativePath, String uploadBasePath) {
-        return Paths.get(uploadBasePath, relativePath);
+        if (relativePath == null || relativePath.isBlank()) {
+            throw new LibraryException("Invalid relative file path");
+        }
+        Path base = Paths.get(uploadBasePath != null ? uploadBasePath : ".").toAbsolutePath().normalize();
+        Path target = base.resolve(relativePath).toAbsolutePath().normalize();
+        if (!target.startsWith(base)) {
+            throw new LibraryException("Security Violation: Access denied for file path traversal attempt");
+        }
+        return target;
     }
 }
