@@ -16,9 +16,18 @@ public final class HibernateUtil {
         try {
             Configuration cfg = new Configuration().configure();
 
+            java.util.Properties props = new java.util.Properties();
+            try (java.io.InputStream in = HibernateUtil.class.getClassLoader().getResourceAsStream("db.properties")) {
+                if (in != null) {
+                    props.load(in);
+                }
+            } catch (Exception ignored) {}
+
             String envUrl = System.getenv("dbUrl") != null ? System.getenv("dbUrl")
                     : (System.getenv("jdbcUrl") != null ? System.getenv("jdbcUrl")
-                    : (System.getenv("JDBC_URL") != null ? System.getenv("JDBC_URL") : System.getenv("DB_URL")));
+                    : (System.getenv("JDBC_URL") != null ? System.getenv("JDBC_URL")
+                    : (System.getenv("DB_URL") != null ? System.getenv("DB_URL")
+                    : props.getProperty("dbUrl", props.getProperty("db.url", null)))));
             String envHost = System.getenv("dbHost") != null ? System.getenv("dbHost") : System.getenv("DB_HOST");
             String envPort = System.getenv("dbPort") != null ? System.getenv("dbPort") : System.getenv("DB_PORT");
             String envName = System.getenv("dbName") != null ? System.getenv("dbName") : System.getenv("DB_NAME");
@@ -32,13 +41,17 @@ public final class HibernateUtil {
             }
 
             String envUser = System.getenv("dbUsername") != null ? System.getenv("dbUsername")
-                    : (System.getenv("DB_USER") != null ? System.getenv("DB_USER") : System.getenv("DB_USERNAME"));
+                    : (System.getenv("DB_USER") != null ? System.getenv("DB_USER")
+                    : (System.getenv("DB_USERNAME") != null ? System.getenv("DB_USERNAME")
+                    : props.getProperty("dbUsername", props.getProperty("db.username", null))));
             if (envUser != null && !envUser.isBlank()) {
                 cfg.setProperty("hibernate.connection.username", envUser);
             }
 
             String envPass = System.getenv("dbPassword") != null ? System.getenv("dbPassword")
-                    : (System.getenv("DB_PASS") != null ? System.getenv("DB_PASS") : System.getenv("DB_PASSWORD"));
+                    : (System.getenv("DB_PASS") != null ? System.getenv("DB_PASS")
+                    : (System.getenv("DB_PASSWORD") != null ? System.getenv("DB_PASSWORD")
+                    : props.getProperty("dbPassword", props.getProperty("db.password", null))));
             if (envPass != null && !envPass.isBlank()) {
                 cfg.setProperty("hibernate.connection.password", envPass);
             }
