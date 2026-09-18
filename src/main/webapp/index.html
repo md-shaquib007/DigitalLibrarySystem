@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Digital Library – Open Access Textbooks & Research</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-light: #3b82f6;
+            --accent: #06b6d4;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #0f172a;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --radius: 12px;
+        }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; }
+        .container { width: calc(100% - 2rem); max-width: 1200px; margin: 0 auto; }
+        .navbar { background: var(--card); border-bottom: 1px solid var(--border); padding: 1rem 0; sticky; top: 0; z-index: 100; }
+        .nav-inner { display: flex; align-items: center; justify-content: space-between; }
+        .logo { font-size: 1.4rem; font-weight: 700; color: var(--primary); text-decoration: none; }
+        .hero { background: linear-gradient(135deg, var(--primary) 0%, #1e1b4b 100%); color: white; padding: 3.5rem 0; margin-bottom: 2rem; }
+        .hero h1 { font-size: 2.3rem; margin-bottom: 0.5rem; }
+        .hero p { opacity: 0.9; font-size: 1.1rem; max-width: 650px; }
+        .search-box { display: flex; gap: 0.5rem; max-width: 550px; margin-top: 1.5rem; }
+        .search-input { flex: 1; padding: 0.75rem 1rem; border: none; border-radius: 8px; font-size: 1rem; }
+        .search-btn { padding: 0.75rem 1.5rem; background: var(--primary-light); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.5rem; }
+        .book-card { background: white; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.2s; }
+        .book-card:hover { transform: translateY(-4px); }
+        .book-cover { height: 200px; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 3.5rem; }
+        .book-body { padding: 1.25rem; }
+        .book-category { font-size: 0.75rem; font-weight: 700; color: var(--primary-light); text-transform: uppercase; margin-bottom: 0.3rem; }
+        .book-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.3rem; }
+        .book-author { font-size: 0.85rem; color: var(--muted); margin-bottom: 1rem; }
+        .download-btn { width: 100%; padding: 0.6rem; background: var(--primary); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.4rem; text-decoration: none; }
+        .download-btn:hover { background: var(--primary-light); text-decoration: none; }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <nav class="navbar">
+        <div class="container nav-inner">
+            <a href="index.html" class="logo"><i class="fa-solid fa-book-open-reader"></i> Smart <span>Digital Library</span></a>
+            <div style="display:flex; gap:1rem; align-items:center;">
+                <a href="login" style="padding:0.5rem 1rem; border:1px solid var(--border); border-radius:6px; color:var(--text); text-decoration:none; font-weight:600;">
+                    <i class="fa-solid fa-lock"></i> Staff Login
+                </a>
+                <a href="api/health" target="_blank" style="padding:0.5rem 1rem; background:#eff6ff; border-radius:6px; color:var(--primary-light); text-decoration:none; font-weight:600;">
+                    <i class="fa-solid fa-heart-pulse"></i> API Status
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="container">
+            <h1>Open Access Academic Library & PDF Repository</h1>
+            <p>Free open access textbooks, computer science guides, research papers, and technical books for college students. Zero registration required for reading or downloading.</p>
+            
+            <div class="search-box">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search by book title, author, or technology..." onkeyup="filterBooks()">
+                <button class="search-btn"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Catalog Grid -->
+    <main class="container" style="margin-bottom: 3rem;">
+        <h2 style="font-size: 1.5rem; margin-bottom: 1.5rem; color: var(--primary);"><i class="fa-solid fa-layer-group"></i> Featured Technical Collections</h2>
+        
+        <div class="grid" id="bookGrid">
+            <div class="book-card">
+                <div class="book-cover" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);">
+                    <i class="fa-brands fa-java"></i>
+                </div>
+                <div class="book-body">
+                    <div class="book-category">Computer Science</div>
+                    <div class="book-title">Java Enterprise Applications & Architecture</div>
+                    <div class="book-author">By Prof. E. Chen</div>
+                    <a href="download/1" class="download-btn"><i class="fa-solid fa-file-pdf"></i> Download PDF</a>
+                </div>
+            </div>
+
+            <div class="book-card">
+                <div class="book-cover" style="background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div class="book-body">
+                    <div class="book-category">Ethical Hacking</div>
+                    <div class="book-title">Ethical Hacking Fundamentals & Defense</div>
+                    <div class="book-author">By Dr. A. Adams</div>
+                    <a href="download/2" class="download-btn"><i class="fa-solid fa-file-pdf"></i> Download PDF</a>
+                </div>
+            </div>
+
+            <div class="book-card">
+                <div class="book-cover" style="background: linear-gradient(135deg, #059669 0%, #047857 100%);">
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <div class="book-body">
+                    <div class="book-category">Product Management</div>
+                    <div class="book-title">Modern Product Management & Agile</div>
+                    <div class="book-author">By R. Davis</div>
+                    <a href="download/3" class="download-btn"><i class="fa-solid fa-file-pdf"></i> Download PDF</a>
+                </div>
+            </div>
+
+            <div class="book-card">
+                <div class="book-cover" style="background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);">
+                    <i class="fa-solid fa-brain"></i>
+                </div>
+                <div class="book-body">
+                    <div class="book-category">Artificial Intelligence</div>
+                    <div class="book-title">Machine Learning & Neural Networks</div>
+                    <div class="book-author">By Dr. S. K. Patel</div>
+                    <a href="download/4" class="download-btn"><i class="fa-solid fa-file-pdf"></i> Download PDF</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function filterBooks() {
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('#bookGrid .book-card');
+            cards.forEach(card => {
+                const text = card.innerText.toLowerCase();
+                card.style.display = text.includes(q) ? 'block' : 'none';
+            });
+        }
+    </script>
+</body>
+</html>
