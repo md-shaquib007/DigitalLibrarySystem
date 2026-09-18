@@ -7,6 +7,7 @@ import com.college.library.entity.Book;
 import com.college.library.exception.LibraryException;
 import com.college.library.service.BookService;
 import com.college.library.service.CatalogService;
+import org.apache.commons.fileupload2.core.DiskFileItem;
 import org.apache.commons.fileupload2.core.DiskFileItemFactory;
 import org.apache.commons.fileupload2.core.FileItem;
 import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletFileUpload;
@@ -172,11 +173,11 @@ public class BookServlet extends BaseServlet {
         if (JakartaServletFileUpload.isMultipartContent(request)) {
             Path tempDir = Path.of(getServletContext().getRealPath("/"), "temp");
             DiskFileItemFactory factory = DiskFileItemFactory.builder().setPath(tempDir).get();
-            JakartaServletFileUpload upload = new JakartaServletFileUpload(factory);
+            JakartaServletFileUpload<DiskFileItem, DiskFileItemFactory> upload = new JakartaServletFileUpload<>(factory);
             upload.setFileSizeMax(50 * 1024 * 1024);
 
-            List<FileItem> items = upload.parseRequest(request);
-            for (FileItem item : items) {
+            List<DiskFileItem> items = upload.parseRequest(request);
+            for (DiskFileItem item : items) {
                 if (item.isFormField()) {
                     mapFormField(dto, item.getFieldName(), item.getString());
                 } else if ("bookFile".equals(item.getFieldName()) && !item.getName().isBlank()) {
