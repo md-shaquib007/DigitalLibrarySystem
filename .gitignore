@@ -29,6 +29,7 @@ uploads/books/*
 
 # Local config overrides
 src/main/resources/hibernate-local.cfg.xml
+src/main/resources/db.properties
 .env
 *.local.properties
 
