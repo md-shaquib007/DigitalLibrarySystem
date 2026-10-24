@@ -49,6 +49,13 @@
             <version>8.3.0</version>
         </dependency>
 
+        <!-- PostgreSQL for Neon -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.3</version>
+        </dependency>
+
         <!-- Connection Pool -->
         <dependency>
             <groupId>com.zaxxer</groupId>

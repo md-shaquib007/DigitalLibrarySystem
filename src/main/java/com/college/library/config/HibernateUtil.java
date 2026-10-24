@@ -23,17 +23,30 @@ public final class HibernateUtil {
                 }
             } catch (Exception ignored) {}
 
-            String envUrl = System.getenv("dbUrl") != null ? System.getenv("dbUrl")
+            String envUrl = System.getenv("neonDbUrl") != null ? System.getenv("neonDbUrl")
+                    : (System.getenv("NEON_DB_URL") != null ? System.getenv("NEON_DB_URL")
+                    : (props.getProperty("neonDbUrl") != null ? props.getProperty("neonDbUrl")
+                    : (System.getenv("dbUrl") != null ? System.getenv("dbUrl")
                     : (System.getenv("jdbcUrl") != null ? System.getenv("jdbcUrl")
                     : (System.getenv("JDBC_URL") != null ? System.getenv("JDBC_URL")
                     : (System.getenv("DB_URL") != null ? System.getenv("DB_URL")
-                    : props.getProperty("dbUrl", props.getProperty("db.url", null)))));
+                    : props.getProperty("dbUrl", props.getProperty("db.url", null))))))));
+
             String envHost = System.getenv("dbHost") != null ? System.getenv("dbHost") : System.getenv("DB_HOST");
             String envPort = System.getenv("dbPort") != null ? System.getenv("dbPort") : System.getenv("DB_PORT");
             String envName = System.getenv("dbName") != null ? System.getenv("dbName") : System.getenv("DB_NAME");
 
             if (envUrl != null && !envUrl.isBlank()) {
+                if (envUrl.startsWith("postgres://")) {
+                    envUrl = "jdbc:postgresql://" + envUrl.substring(11);
+                } else if (envUrl.startsWith("postgresql://")) {
+                    envUrl = "jdbc:postgresql://" + envUrl.substring(13);
+                }
                 cfg.setProperty("hibernate.connection.url", envUrl);
+                if (envUrl.contains("postgresql")) {
+                    cfg.setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
+                    cfg.setProperty("hibernate.connection.driver_class", "org.postgresql.Driver");
+                }
             } else if (envHost != null && !envHost.isBlank()) {
                 String port = (envPort != null && !envPort.isBlank()) ? envPort : "3306";
                 String name = (envName != null && !envName.isBlank()) ? envName : "digital_library";
