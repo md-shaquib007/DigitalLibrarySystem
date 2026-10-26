@@ -14,7 +14,7 @@
         <div class="card-body">
             <form th:action="@{/books}" method="get" class="row g-3">
                 <div class="col-md-4">
-                    <input type="text" name="keyword" class="form-control" placeholder="Search title, tags, ISBN..."
+                    <input type="text" id="liveKeywordInput" name="keyword" class="form-control" placeholder="Search title, tags, ISBN... (Live filter)"
                            th:value="${search.keyword}"/>
                 </div>
                 <div class="col-md-2">
@@ -53,7 +53,7 @@
 
     <!-- Book Grid -->
     <div class="row g-4">
-        <div class="col-md-6 col-lg-4" th:each="book : ${books}">
+        <div class="col-md-6 col-lg-4 book-col" th:each="book : ${books}" th:attr="data-title=${book.title},data-category=${book.category.name},data-isbn=${book.isbn},data-desc=${book.description},data-id=${book.id},data-copies=${book.availableCopies}">
             <div class="card book-card h-100 border-0 shadow-sm">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start mb-2">
@@ -68,6 +68,7 @@
                     </div>
                     <div class="d-flex gap-2">
                         <a th:href="@{/books/{id}(id=${book.id})}" class="btn btn-sm btn-outline-primary">View</a>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="showQuickPreview(this)"><i class="bi bi-eye"></i> Quick View</button>
                         <a th:if="${book.digitalAvailable}" th:href="@{/download/{id}(id=${book.id})}"
                            class="btn btn-sm btn-danger"><i class="bi bi-download"></i> PDF</a>
                     </div>
@@ -96,5 +97,59 @@
             </li>
         </ul>
     </nav>
+    <!-- Dynamic Quick Preview Modal -->
+    <div class="modal fade" id="quickPreviewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-0 pb-0">
+                    <span id="modalCategory" class="badge bg-primary">Category</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body pt-2">
+                    <h4 id="modalTitle" class="fw-bold mb-1">Book Title</h4>
+                    <div class="text-muted small mb-3">ISBN: <span id="modalIsbn">N/A</span> · Available Copies: <span id="modalCopies" class="badge bg-success">1</span></div>
+                    <p id="modalDesc" class="text-secondary small" style="line-height:1.6;max-height:180px;overflow-y:auto;"></p>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <a id="modalDetailLink" href="#" class="btn btn-primary btn-sm">Full Details & Borrow</a>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function showQuickPreview(btn) {
+        const col = btn.closest('.book-col');
+        if (!col) return;
+        document.getElementById('modalTitle').textContent = col.getAttribute('data-title') || 'Book';
+        document.getElementById('modalCategory').textContent = col.getAttribute('data-category') || 'General';
+        document.getElementById('modalIsbn').textContent = col.getAttribute('data-isbn') || 'None';
+        document.getElementById('modalCopies').textContent = col.getAttribute('data-copies') || '0';
+        document.getElementById('modalDesc').textContent = col.getAttribute('data-desc') || 'No description available.';
+        const id = col.getAttribute('data-id');
+        document.getElementById('modalDetailLink').href = '/books/' + id;
+        const modal = new bootstrap.Modal(document.getElementById('quickPreviewModal'));
+        modal.show();
+    }
+
+    // Dynamic Live Filter
+    document.addEventListener('DOMContentLoaded', function() {
+        const input = document.getElementById('liveKeywordInput');
+        if (!input) return;
+        input.addEventListener('input', function() {
+            const query = (input.value || '').toLowerCase().trim();
+            const cards = document.querySelectorAll('.book-col');
+            cards.forEach(card => {
+                const title = (card.getAttribute('data-title') || '').toLowerCase();
+                const cat = (card.getAttribute('data-category') || '').toLowerCase();
+                const isbn = (card.getAttribute('data-isbn') || '').toLowerCase();
+                const desc = (card.getAttribute('data-desc') || '').toLowerCase();
+                const matches = title.includes(query) || cat.includes(query) || isbn.includes(query) || desc.includes(query);
+                card.style.display = matches ? '' : 'none';
+            });
+        });
+    });
+    </script>
 </section>
 </html>
