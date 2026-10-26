@@ -8,6 +8,18 @@
                     <h3 th:text="${title}">Book Form</h3>
                     <form th:action="${action}" method="post" enctype="multipart/form-data" class="mt-4">
                         <div class="mb-3">
+                            <label class="form-label fw-bold">ISBN (10 or 13 digits)</label>
+                            <div class="input-group">
+                                <input type="text" id="isbnInput" name="isbn" class="form-control"
+                                       placeholder="e.g. 9780134685991"
+                                       th:value="${dto != null ? dto.isbn : ''}"/>
+                                <button class="btn btn-outline-primary" type="button" id="btnLookupIsbn">
+                                    Auto-Fetch Metadata
+                                </button>
+                            </div>
+                            <small class="text-muted" id="isbnStatus">Enter an ISBN and click auto-fetch to automatically populate Title, Edition, Authors, and Description from OpenLibrary / Google Books.</small>
+                        </div>
+                        <div class="mb-3">
                             <label class="form-label">Title *</label>
                             <input type="text" name="title" class="form-control" required
                                    th:value="${dto != null ? dto.title : ''}"/>
@@ -72,5 +84,46 @@
             </div>
         </div>
     </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const btn = document.getElementById('btnLookupIsbn');
+        const isbnInput = document.getElementById('isbnInput');
+        const status = document.getElementById('isbnStatus');
+        if (!btn || !isbnInput) return;
+
+        btn.addEventListener('click', function() {
+            const isbn = isbnInput.value.trim();
+            if (!isbn) {
+                alert('Please enter an ISBN number first.');
+                return;
+            }
+            btn.disabled = true;
+            status.innerHTML = '<span class="text-primary"><span class="spinner-border spinner-border-sm me-1"></span>Fetching book metadata...</span>';
+
+            fetch('/books/lookup?isbn=' + encodeURIComponent(isbn))
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    btn.disabled = false;
+                    if (data && data.title) {
+                        const titleInput = document.querySelector('input[name="title"]');
+                        if (titleInput) titleInput.value = data.title;
+                        const editionInput = document.querySelector('input[name="edition"]');
+                        if (editionInput && data.edition) editionInput.value = data.edition;
+                        const descInput = document.querySelector('textarea[name="description"]');
+                        if (descInput && data.description) descInput.value = data.description;
+                        const authorInput = document.querySelector('input[name="authorNames"]');
+                        if (authorInput && data.authors) authorInput.value = data.authors;
+                        status.innerHTML = '<span class="text-success">Book details fetched successfully!</span>';
+                    } else {
+                        status.innerHTML = '<span class="text-warning">No metadata found for this ISBN. You can still fill fields manually.</span>';
+                    }
+                })
+                .catch(function(err) {
+                    btn.disabled = false;
+                    status.innerHTML = '<span class="text-danger">Error fetching metadata. Please fill manually.</span>';
+                });
+        });
+    });
+    </script>
 </section>
 </html>

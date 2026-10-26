@@ -126,4 +126,29 @@ public class BorrowService {
     public long countOverdueBorrows() {
         return borrowRepository.countOverdueBorrows();
     }
+
+    public int recalculateOverdueFines() {
+        List<BorrowRecord> activeBorrows = borrowRepository.findActiveBorrows();
+        int updatedCount = 0;
+        LocalDate today = LocalDate.now();
+        for (BorrowRecord record : activeBorrows) {
+            if (record.getDueDate() != null && today.isAfter(record.getDueDate())) {
+                long overdueDays = record.getOverdueDays();
+                if (overdueDays > 0) {
+                    Fine fine = record.getFine();
+                    if (fine == null) {
+                        fine = new Fine();
+                        fine.setBorrowRecord(record);
+                        record.setFine(fine);
+                    }
+                    fine.setOverdueDays((int) overdueDays);
+                    fine.setAmount(BigDecimal.valueOf(overdueDays * AppConstants.FINE_PER_DAY));
+                    borrowRepository.save(record);
+                    updatedCount++;
+                }
+            }
+        }
+        log.info("Recalculated overdue fines for {} active records", updatedCount);
+        return updatedCount;
+    }
 }

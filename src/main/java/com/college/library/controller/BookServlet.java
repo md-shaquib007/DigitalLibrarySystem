@@ -27,11 +27,17 @@ public class BookServlet extends BaseServlet {
 
     private final BookService bookService = new BookService();
     private final CatalogService catalogService = new CatalogService();
+    private final com.college.library.service.IsbnLookupService isbnLookupService = new com.college.library.service.IsbnLookupService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String pathInfo = request.getPathInfo();
+
+        if ("/lookup".equals(pathInfo) || "lookup".equals(request.getParameter("action"))) {
+            lookupIsbn(request, response);
+            return;
+        }
 
         if (pathInfo == null || pathInfo.equals("/")) {
             listBooks(request, response);
@@ -44,6 +50,14 @@ public class BookServlet extends BaseServlet {
         } else {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
+    }
+
+    private void lookupIsbn(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String isbn = request.getParameter("isbn");
+        java.util.Map<String, String> data = isbnLookupService.lookupByIsbn(isbn);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        new com.google.gson.Gson().toJson(data, response.getWriter());
     }
 
     @Override
